@@ -8,17 +8,21 @@ pytestmark = pytest.mark.slow
 _docker_client = docker.from_env()
 
 
-@pytest.mark.parametrize("dockerfile_path", ["keras.test.Dockerfile",
-                                             "matplotlib.test.Dockerfile",
-                                             "scipy.test.Dockerfile",
-                                             "numpy.test.Dockerfile",
-                                             "boto3.test.Dockerfile",
-                                             "pandas.test.Dockerfile",
-                                             "pytorch.examples.Dockerfile",
-                                             "tensorflow.examples.Dockerfile"])
+@pytest.mark.parametrize("dockerfile_path", [
+    "keras.test.Dockerfile",
+    "matplotlib.test.Dockerfile",
+    "scipy.test.Dockerfile",
+    "numpy.test.Dockerfile",
+    "boto3.test.Dockerfile",
+    "pandas.test.Dockerfile",
+    "pytorch.examples.Dockerfile",
+    "tensorflow.examples.Dockerfile",
+    "autogluon.test.Dockerfile",
+])
 def test_dockerfiles(dockerfile_path: str, local_image_id: str, use_gpu: bool):
     print(f'Will start running test for: {dockerfile_path} against: {local_image_id}')
     image, _ = _docker_client.images.build(path='test/test_artifacts', dockerfile=dockerfile_path,
+                                           tag=dockerfile_path.lower().replace('.', '-'),
                                            rm=True, buildargs={'COSMOS_IMAGE': local_image_id})
     print(f'Built a test image: {image.id}, will now execute its default CMD.')
     # Execute the new image once. Mark the current test successful/failed based on container's exit code. (We assume
